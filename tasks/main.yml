@@ -5,6 +5,19 @@
     state: present
     key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
+- name: "generate ssh key for root"
+  user:
+    name: root
+    ssh_key_bits: 4096
+    generate_ssh_key: yes
+
+- name: "only allow root login without-password"
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^#PermitRootLogin yes'
+    line: 'PermitRootLogin without-password'
+  notify: "restart sshd"
+
 - name: "add nginx repo"
   yum_repository:
     name: nginx
@@ -13,8 +26,129 @@
     gpgkey: https://nginx.org/keys/nginx_signing.key
     gpgcheck: yes
 
+- name: "add epel repo"
+  yum_repository:
+    name: epel
+    description: Extra Packages for Enterprise Linux 7 - $basearch
+    mirrorlist: https://mirrors.fedoraproject.org/metalink?repo=epel-7&arch=$basearch
+    failovermethod: priority
+    gpgkey: https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-7
+    gpgcheck: yes
+
 - name: "install necessary packages"
   yum:
     name: "{{ item }}"
   with_items:
     - nginx
+    - lsof
+    - tcpdump
+    - knot
+    - traceroute
+    - rsync
+    - bind-utils
+    - php
+    - php-mysql
+    - php-fpm
+
+- name: "add webadmin user"
+  user:
+    name: webadmin
+
+- name: "create bin dir for rrsync"
+  file:
+    path: /home/webadmin/bin
+    state: directory
+    owner: webadmin
+    group: webadmin
+    mode: 0755
+
+- name: "download rrsync for webadmin"
+  get_url:
+    url: http://ftp.samba.org/pub/unpacked/rsync/support/rrsync
+    dest: /home/webadmin/bin/rrsync
+    mode: 0755
+
+- name: "create .ssh dir"
+  file:
+    path: /home/webadmin/.ssh
+    state: directory
+    owner: webadmin
+    group: webadmin
+    mode: 0700
+
+- name: "copy authorized_keys for webadmin user"
+  copy:
+    src: authorized_keys
+    dest: /home/webadmin/.ssh/authorized_keys
+    owner: webadmin
+    group: webadmin
+    mode: 0600
+
+- name: "copy nginx config files"
+  copy:
+    src: cam.lkcm.eu.conf
+    dest: /etc/nginx/conf.d/cam.lkcm.eu.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: "restart nginx"
+
+- name: "edit php settings"
+  lineinfile:
+    dest: /etc/php.ini
+    regexp: '^;cgi.fix_pathinfo=1'
+    line: 'cgi.fix_pathinfo=0'
+  notify: "restart php-fpm"
+
+- name: "edit www.conf for php-fpm"
+  lineinfile:
+    create: yes
+    dest: /etc/php-fpm.d/www.conf
+    line: "{{ item }}"
+  with_items:
+    - listen = /var/run/php-fpm/php-fpm.sock
+    - listen.owner = nobody
+    - listen.group = nobody
+    - user = nginx
+    - group = nginx
+  notify: "restart php-fpm"
+
+- name: "copy knot config file"
+  copy:
+    src: knot.conf
+    dest: /etc/knot/knot.conf
+    owner: root
+    group: root
+    mode: 0640
+  notify: "restart knot"
+
+- name: "copy knot zone files"
+  copy:
+    src: "{{ item }}"
+    dest: /etc/knot/{{ item }}
+    owner: knot
+    group: knot
+    mode: 0644
+  with_items:
+    - 2001.470.6f.45.zone
+    - jozsa.cz.zone
+  notify: "restart knot"
+
+- name: "create cam www dir"
+  file:
+    path: /var/www/cam.lkcm.eu/html/
+    state: directory
+    owner: webadmin
+    group: nginx
+    mode: 0775
+  notify: "restart nginx"
+
+- name: "enable httpd in firewalld"
+  firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+  with_items:
+    - http
+    - dns
+  notify: "restart firewalld"

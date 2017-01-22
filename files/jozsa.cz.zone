@@ -1,0 +1,22 @@
+$ORIGIN jozsa.cz.
+jozsa.cz.		3600	IN	SOA	ns.lkcm.eu. admin.lkcm.eu. 2017010101 3600 1800 2592000 3600
+jozsa.cz.		1800	IN	AAAA	2a02:2b88:1:4::16
+jozsa.cz.		1800	IN	A	46.28.105.2
+jozsa.cz.		3600	IN	NS	ns.lkcm.eu.
+jozsa.cz.		3600	IN	NS	ns.jozsa.cz.
+*.jozsa.cz.		1800	IN	A	46.28.105.2
+home-laptop-wifi.jozsa.cz. 1800	IN	AAAA	2001:470:6e:45:2677:3ff:fe40:b13c
+htpc.jozsa.cz.		1800	IN	AAAA	2a01:4240:5f52:8c07:225:d3ff:fec7:7c5
+my-iphone-jih.jozsa.cz.	1800	IN	AAAA	2a01:4240:5f52:8c07:c5e8:f7bc:4b2:e261
+synology-brn.jozsa.cz.	1800	IN	AAAA	2001:470:6e:45::e51
+synology-jih.jozsa.cz.	1800	IN	AAAA	2a01:4240:5f52:8c07:211:32ff:fe04:ce24
+tablet.jozsa.cz.	1800	IN	AAAA	2a01:4240:5f52:8c07:6c60:daeb:1387:51f6
+tata.jozsa.cz.		1800	IN	AAAA	2a01:4240:5f52:8c07:c577:c90f:2910:eb3f
+tata-iphone-jih.jozsa.cz. 1800	IN	AAAA	2a01:4240:5f52:8c07:dca7:e10c:d220:9429
+work-laptop-wifi.jozsa.cz. 1800	IN	AAAA	2001:470:6e:45:3602:86ff:fe76:cf6e
+router-jih.jozsa.cz.	1800	IN	A	95.82.140.7
+router-jih.jozsa.cz.	1800	IN	AAAA	2a01:4240:5f52:8c07::1
+router-brn.jozsa.cz.	1800	IN	AAAA	2001:470:6e:45::2
+ns.jozsa.cz.		1800	IN	A	95.82.140.7
+ns.jozsa.cz.		1800	IN	AAAA	2a01:4240:5f52:8c07::1
+
