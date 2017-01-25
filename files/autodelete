@@ -1,0 +1,2 @@
+0 0 * * * root /usr/bin/find /var/www/cam.lkcm.eu/html/_sfpg_data/ -mtime +1 -mindepth 3 -delete
+0 0 * * * root /usr/bin/find /var/www/cam.lkcm.eu/html/ -mtime +1 -mindepth 2 ! -path "*/_sfpg_data/*" -delete
